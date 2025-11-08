@@ -36,3 +36,18 @@ Tugas 7
 
 6. Jelaskan konsep "hot reload" di Flutter dan bagaimana bedanya dengan "hot restart".
    Hot reload memasukkan perubahan kode di aplikasi yang sedang running tanpa merestart aplikasi dan menghapus state. Hot restart merestart aplikasi dari awal yang menyebabkan state aplikasi hilang dan semua variabel balik ke kondisi awal.
+
+Tugas 8
+1. Jelaskan perbedaan antara Navigator.push() dan Navigator.pushReplacement() pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
+   Navigator.push() digunakan untuk menambahkan halaman baru di atas halaman saat ini, memungkinkan pengguna untuk kembali ke halaman sebelumnya. Digunakan kalo pengguna perlu navigasi ke halaman baru tanpa kehilangan akses ke halaman sebelumnya, contohnya saat melihat detail produk.
+   Navigator.pushReplacement() menggantikan halaman saat ini dengan halaman baru, sehingga pengguna tidak dapat kembali ke halaman sebelumnya. Digunakan kalo pengguna abis selesaikan suatu proses dan gak perlu kembali, contohnya setelah menyelesaikan pembayaran atau mengonfirmasi pesanan.
+
+2. Bagaimana kamu memanfaatkan hierarchy widget seperti Scaffold, AppBar, dan Drawer untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
+   Saya menggunakan Scaffold sebagai skeleton halaman aplikasi, yang menyediakan struktur umum seperti AppBar di bagian atas dan Drawer di sisi kiri. AppBar digunakan untuk menampilkan judul halaman dan navigasi utama, sementara Drawer menyediakan menu navigasi tambahan yang konsisten di seluruh aplikasi. 
+
+3. Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti Padding, SingleChildScrollView, dan ListView saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
+   Kelebihan pakai Padding adalah memberikan jarak yang konsisten di sekitar elemen form, sehingga tampilan lebih rapi dan mudah dibaca. SingleChildScrollView memungkinkan konten form yang panjang untuk di-scroll, sehingga pengguna dapat mengakses semua elemen tanpa terpotong. ListView berfungsi buat nampilin daftar elemen form yang disusun secara vertikal, seperti daftar produk atau kategori.
+   Contoh penggunaannya di aplikasi saya adalah dengan menggunakan ListView untuk drawer, sehingga tombol 'Home' dan 'Add Product' bisa tersusun secara vertikal. Saya juga menggunakan Padding di sekitar setiap elemen form untuk memberikan space kosong agar tampilan tidak terlalu padat. 
+
+4. Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
+   Saya menggunakan ColorScheme di MaterialApp untuk mengatur warna primary, secondary, teks dan ikon. ColorScheme tersebut terletak di file main.dart, di dalam ThemeData. 
