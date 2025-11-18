@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'screens/menu.dart';
+import 'package:provider/provider.dart';
+import 'package:red_sportswear/screens/login.dart';
+import 'package:red_sportswear/providers/user_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +15,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        Provider<CookieRequest>(create: (_) => CookieRequest()),
+        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
+      ],
+    child: MaterialApp(
       title: 'Red Sportswear',
       theme: ThemeData(
         // This is the theme of your application.
@@ -40,10 +49,11 @@ class MyApp extends StatelessWidget {
           onSurface: Colors.black,
           onBackground: Colors.black,
           onError: Colors.white,
-        ),
+          ),
 
+        ),
+      home: const LoginPage(),
       ),
-      home: MyHomePage(),
     );
   }
 }

@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:red_sportswear/widgets/drawer.dart';
+import 'package:red_sportswear/screens/login.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'dart:convert';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:red_sportswear/screens/menu.dart';
+import 'package:red_sportswear/models/user.dart';
+import 'package:red_sportswear/providers/user_provider.dart';
 
-class NewsFormPage extends StatefulWidget {
-  const NewsFormPage({super.key});
+class ProductFormPage extends StatefulWidget {
+  const ProductFormPage({super.key});
 
   @override
-  State<NewsFormPage> createState() => _NewsFormPageState();
+  State<ProductFormPage> createState() => _NewsFormPageState();
 }
 
-class _NewsFormPageState extends State<NewsFormPage> {
+class _NewsFormPageState extends State<ProductFormPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -48,6 +55,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -262,56 +270,47 @@ class _NewsFormPageState extends State<NewsFormPage> {
                         const Color(0xFF900D16),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Product successfully added!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Name : $_name'),
-                                    Text('Description : $_description'),
-                                    Text('Price : $_price'),
-                                    Text('Stock : $_stock'),
-                                    Text('Category : $_category'),
-                                    Text('Thumbnail : $_thumbnail'),
-                                    Text(
-                                        'Featured : ${_isFeatured ? "Yes" : "No"}'),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    setState(() {
-                                      _nameController.clear();
-                                      _descriptionController.clear();
-                                      _priceController.clear();
-                                      _stockController.clear();
-                                      _thumbnailController.clear();
+                        // TODO: Replace the URL with your app's URL
+                        // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
+                        // If you using chrome,  use URL http://localhost:8000
 
-                                      _name = "";
-                                      _price = 0;
-                                      _description = "";
-                                      _stock = 0;
-                                      _category = "topi";
-                                      _thumbnail = "";
-                                      _isFeatured = false;
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                        final response = await request.postJson(
+                          "http://localhost:8000/create-flutter/",
+                          jsonEncode({
+                            "name": _name,
+                            "description": _description,
+                            "price": _price,
+                            "stok": _stock,
+                            "thumbnail": _thumbnail,
+                            "category": _category,
+                            "is_featured": _isFeatured,
+                          }),
                         );
-                        _formKey.currentState!.reset();
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            final userJson = response['user'] as Map<String, dynamic>?;
+                            if (userJson != null) {
+                              final user = User.fromJson(userJson);
+                              context.read<UserProvider>().setUser(user);
+                            }
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text("Product successfully saved!"),
+                            ));
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MyHomePage()),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(
+                              content: Text("Something went wrong, please try again."),
+                            ));
+                          }
+                        }
                       }
                     },
                     child: const Text(
