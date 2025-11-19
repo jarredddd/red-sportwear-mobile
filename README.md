@@ -91,5 +91,5 @@ Tugas 9
    
     - Melakukan filter pada halaman daftar item dengan hanya menampilkan item yang terasosiasi dengan pengguna yang login. -> Saya lakukan dengan menambahkan parameter user pada endpoint JSON di Django **[user=request.user]**, lalu memodifikasi query di Django untuk hanya mengembalikan item yang terasosiasi dengan user yang sedang login **[qs = Product.objects.filter(user=request.user).select_related("user")]**. Di Flutter, saya memastikan CookieRequest menyediakan cookie session saat melakukan request ke endpoint JSON.\
    
-Kak maaf ini aku push Django nya ke branch baru ya kak, soalnya aku gak paham pas ngepush ke branch master. Jadinya di branch tugas9, makasih ya kakk :)
+
     
