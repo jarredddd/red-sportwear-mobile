@@ -14,17 +14,16 @@ class ProductEntryListPage extends StatefulWidget {
 }
 
 class _ProductEntryListPageState extends State<ProductEntryListPage> {
-  Future<List<ProductEntry>> fetchProduct(CookieRequest request) async {
-    // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)!
-    // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-    // If you using chrome,  use URL http://localhost:8000
+  bool _showOnlyUserItems = false;
 
-    final response = await request.get('http://localhost:8000/json/');
+  Future<List<ProductEntry>> fetchProduct(CookieRequest request, bool filterByUser) async {
+    final url = filterByUser
+        ? 'http://localhost:8000/show-product-user/'
+        : 'http://localhost:8000/json/';
 
-    // Decode response to json format
+    final response = await request.get(url);
     var data = response;
 
-    // Convert json data to NewsEntry objects
     List<ProductEntry> listProduct = [];
     for (var d in data) {
       if (d != null) {
@@ -40,53 +39,86 @@ class _ProductEntryListPageState extends State<ProductEntryListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Entry List',
-            style: TextStyle(
-              fontSize: 23,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+          style: TextStyle(
+            fontSize: 23,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder(
-        future: fetchProduct(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'There are no products in Red Sportswear yet.',
-                    style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (_, index) => ProductEntryCard(
-                  product: snapshot.data![index],
-                  onTap: () {
-                    // Navigate to news detail page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductDetailPage(
-                          product: snapshot.data![index],
-                        ),
-                      ),
-                    );
+      body: Column(
+        children: [
+          // Filter button section
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _showOnlyUserItems = !_showOnlyUserItems;
+                    });
                   },
+                  icon: Icon(
+                    _showOnlyUserItems ? Icons.filter_alt : Icons.filter_alt_off_outlined,
+                  ),
+                  label: Text(
+                    _showOnlyUserItems ? 'Show All Items' : 'Show My Items Only',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _showOnlyUserItems
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.grey.shade300,
+                    foregroundColor: _showOnlyUserItems
+                        ? Colors.white
+                        : Colors.black87,
+                  ),
                 ),
-              );
-            }
-          }
-        },
+              ],
+            ),
+          ),
+          // Product list section
+          Expanded(
+            child: FutureBuilder(
+              future: fetchProduct(request, _showOnlyUserItems),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'There are no products to display.',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (_, index) => ProductEntryCard(
+                      product: snapshot.data![index],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailPage(
+                              product: snapshot.data![index],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

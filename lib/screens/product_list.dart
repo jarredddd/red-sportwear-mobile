@@ -22,7 +22,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Future<List<ProductEntry>> _load(CookieRequest request) async {
     final url = widget.mineOnly
-        ? "http://localhost:8000/show-json/mine/"
+        ? "http://localhost:8000/show-product-user/"
         : "http://localhost:8000/show-json/";
     final resp = await request.get(url);
     // resp is a List<dynamic> already; encode/decode to reuse existing parser
